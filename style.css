@@ -1,0 +1,11 @@
+a .logotipo{
+    font-size: 30px;
+    color: black;
+    text-align: center;
+}
+.backgroundImg{
+    width: 100% !important;
+}
+body{
+    background-image: "imagens/RoseetoTi";
+}
