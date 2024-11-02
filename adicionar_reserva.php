@@ -1,9 +1,8 @@
 <?php
 session_start();
 require 'config.php';
-
 if (empty($_SESSION['mmnlogin'])) {
-    header("Location: adicionar_reserva.php");
+    header("Location: login.php");
     exit;
 }
 

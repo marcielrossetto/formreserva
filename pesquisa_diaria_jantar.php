@@ -2,7 +2,7 @@
 session_start();
 require 'config.php';
 if (empty($_SESSION['mmnlogin'])) {
-    header("Location: pesquisa_diaria_jantar.php");
+    header("Location: login.php");
     exit;
 }
 require 'cabecalho.php';
@@ -35,9 +35,10 @@ if ($filtro != "") {
     }
 }
 ?>
-
+<button class="btn btn-primary" onclick="printTable()">Imprimir Relatório</button>
+<div id="printableTable" class="table-responsive">
 <div class="table-responsive table-sm">
-    <table class="table table-bordered table-hover table-sm table">
+    <table class="table table-bordered table-hover table-sm table-warning ">
         <tr>
             <th>Id:</th>
             <th>Nome:</th>
@@ -46,6 +47,7 @@ if ($filtro != "") {
             <th>Tipo de Evento:</th>
             <th>Forma pagamento:</th>
             <th>Telefone:</th>
+            <th>Obs</th>
             <th>N° mesa:</th>
         </tr>
         <?php
@@ -61,6 +63,8 @@ if ($filtro != "") {
                 echo '<td>' . $clientes['tipo_evento'] . '</td>';
                 echo '<td>' . $clientes['forma_pagamento'] . '</td>';
                 echo '<td>' . $clientes['telefone'] . '</td>';
+                echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
+
                 echo '<td>' . $clientes['num_mesa'] . '</td>';
                 echo '</tr>';
             }
@@ -68,4 +72,16 @@ if ($filtro != "") {
         ?>
     </table>
 </div>
+</div>
+<script>
+function printTable() {
+        var printContents = document.getElementById('printableTable').innerHTML;
+        var totalPessoas = "<?php echo '<h4>Total de pessoas: ' . $total . '</h4><br>'; ?>";
+        var dataReserva = "<?php echo '<p>Resultados com a data <strong>' . $dataFormatada . '</strong> das 11:00 às 17:59 hs</p>'; ?>";
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = totalPessoas + dataReserva + printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+</script>
 </div>

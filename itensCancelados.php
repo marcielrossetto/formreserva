@@ -40,7 +40,7 @@ require 'cabecalho.php';
     ?>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-sm table-success">
+        <table class="table table-bordered table-hover table-sm table-warning">
             <tr>
                 <th>Id:</th>
                 <th>Nome:</th>

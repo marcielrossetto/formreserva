@@ -2,7 +2,7 @@
 session_start();
 require 'config.php';
 if (empty($_SESSION['mmnlogin'])) {
-    header("Location: pesquisar_almoco.php");
+    header("Location: login.php");
     exit;
 }
 require 'cabecalho_pesquisar_data.php';
@@ -14,12 +14,12 @@ require 'cabecalho_pesquisar_data.php';
     $filtro = isset($_POST['filtro']) ? $_POST['filtro'] : "";
     if ($filtro != "") {
         $data_formatada = date("d/m/Y", strtotime($filtro));
-        print "<h4>Data <strong>$data_formatada</strong> das 12:00 às 17:59 hs</h4><br>";
+        print "<br><h6>Data <strong>$data_formatada</strong> das 12:00 às 17:59 hs</h6><br>";
     }
     ?>
 
     <?php
-    $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE data = '$filtro' AND horario BETWEEN '12:00:00' AND '17:59:00' ORDER BY `data` ASC";
+    $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE data = '$filtro' AND horario BETWEEN '12:00:00' AND '17:59:00' AND status !=0 ORDER BY `data` ASC";
     $sql = $pdo->query($sql);
     $total_pessoas = 0;
     if ($sql->rowCount() > 0) {
@@ -29,7 +29,7 @@ require 'cabecalho_pesquisar_data.php';
     ?>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-sm table-success">
+        <table class="table table-bordered table-hover table-sm table-warning ">
             <tr>
                 <th>Nome:</th>
                 <th>Data:</th>
@@ -44,9 +44,9 @@ require 'cabecalho_pesquisar_data.php';
                 <th>Ações:</th>
             </tr>
             <?php
-            $sql = "SELECT * FROM clientes WHERE data = '$filtro' AND horario BETWEEN '12:00:00' AND '17:59:00' ORDER BY `data` ASC";
-            $sql = $pdo->query($sql);
-            if ($sql->rowCount() > 0) {
+                $sql = "SELECT * FROM clientes WHERE data = '$filtro' AND horario BETWEEN '12:00:00' AND '17:59:00' AND status != 0 ORDER BY `data` ASC";
+                 $sql = $pdo->query($sql);
+                if ($sql->rowCount() > 0) {
                 foreach ($sql->fetchAll() as $clientes) {
                     echo '<tr>';
                     echo '<td>'.$clientes['nome'].'</td>';
@@ -57,9 +57,9 @@ require 'cabecalho_pesquisar_data.php';
                     echo '<td>'.$clientes['telefone2'].'</td>';
                     echo '<td>'.$clientes['tipo_evento'].'</td>';
                     echo '<td>'.$clientes['forma_pagamento'].'</td>';
-                    echo '<td>'.$clientes['observacoes'].'</td>';
+                    echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
                     echo '<td>'.$clientes['data_emissao'].'</td>';
-                    echo '<td><div class="btn-group"><a class="btn btn-primary pequeno" href="editar_reserva.php?id='.$clientes['id'].'">Editar</a><br><a class="btn btn-danger pequeno" href="excluir_reserva.php?id='.$clientes['id'].'">Excluir</a></div></td>';
+                    echo '<td><div class="btn-group"><a class="btn btn-primary pequeno" href="editar_reserva.php?id='.$clientes['id'].'">Editar</a><a class="btn btn-danger pequeno" href="excluir_reserva.php?id='.$clientes['id'].'">Excluir</a></div></td>';
                     echo '</tr>';
                 }
             }

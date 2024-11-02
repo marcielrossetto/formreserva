@@ -5,15 +5,16 @@ if (empty($_SESSION['mmnlogin'])) {
     header("Location: login.php");
     exit;
 }
-require 'cabecalho_pesquisar_data.php';
+require 'cabecalho.php';
 ?>
+
 <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no">
 <div class="container-fluid">
     <?php
-    $filtro = isset($_POST['filtro']) ? $_POST['filtro'] : "";
+    $filtro = isset($_GET['data']) ? $_GET['data'] : "";
     if ($filtro != "") {
         $data_formatada = date("d/m/Y", strtotime($filtro));
-        print "<br><h6>Resultado:<strong>$data_formatada</strong></h6><br>";
+        print "<h6>Resultado:<strong>$data_formatada</strong></h6><br>";
     }
     $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE data = '$filtro' AND status != 0 ORDER BY `data` ASC";
     $sql = $pdo->query($sql);
@@ -23,8 +24,10 @@ require 'cabecalho_pesquisar_data.php';
         echo "<h6>Total de pessoas: $total_pessoas</h6><br>";
     }
     ?>
+        <a href="adicionar_reserva.php" class="btn btn-outline-success my-2 my-sm-0" type="submit"><ion-icon name="add-circle"></ion-icon>Nova Reserva</a><br><br>
+
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-sm table-warning">
+        <table class="table table-bordered table-hover table-sm table-warning ">
             <tr>
                 <th>Nome:</th>
                 <th>Data:</th>

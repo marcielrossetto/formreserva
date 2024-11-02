@@ -7,5 +7,32 @@ a .logotipo{
     width: 100% !important;
 }
 body{
-    background-image: "imagens/RoseetoTi";
+    margin-top: 70px;
+}
+.obs-column {
+    max-width: 200px; /* Ajuste o valor conforme necessário */
+    overflow: auto;
+    text-overflow: ellipsis;
+    white-space: normal; /* Permite quebra de linha */
+    word-wrap: break-word; /* Quebra palavras longas */
+}
+.nav-link {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link ion-icon {
+    margin-right: 5px; /* Espaçamento entre ícone e texto */
+}
+
+ 
+  
+
+
+@media print {
+    .obs-column {
+        max-width: 10px; /* Remove a largura máxima na impressão */
+        white-space: normal; /* Permite quebra de linha */
+        word-wrap: break-word; /* Quebra palavras longas */
+    }
 }

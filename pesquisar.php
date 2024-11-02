@@ -2,7 +2,7 @@
 session_start();
 require 'config.php';
 if (empty($_SESSION['mmnlogin'])) {
-    header("Location: pesquisar.php");
+    header("Location: login.php");
     exit;
 }
 require 'cabecalho.php';
@@ -33,7 +33,7 @@ require 'cabecalho.php';
     if ($filtro != "" && $filtro2 != "" && $horario1 != "" && $horario2 != "") {
         $data_formatada_inicio = date("d/m/Y", strtotime($filtro));
         $data_formatada_fim = date("d/m/Y", strtotime($filtro2));
-        print "<p>Resultados encontrados entre as datas <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong> e horários <strong>$horario1</strong> e <strong>$horario2</strong> hs.</p><br>";
+        print "<p>Resultado <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong> e hs <strong>$horario1</strong> e <strong>$horario2</strong> hs.</p><br>";
     }
 
     $sql = "SELECT SUM(num_pessoas) as total FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND horario BETWEEN '$horario1' AND '$horario2' AND status = 1";
@@ -41,12 +41,12 @@ require 'cabecalho.php';
     $total_pessoas = 0;
     if ($sql->rowCount() > 0) {
         $total_pessoas = $sql->fetch()['total'];
-        echo "<h4>Total de pessoas: $total_pessoas</h4><br>";
+        echo "<h6>Total de pessoas: $total_pessoas</h6><br>";
     }
     ?>
 
     <div class="table-responsive table-sm">
-        <table class="table table-bordered table-hover table-sm table">
+        <table class="table table-bordered table-hover table-sm table-warning">
             <tr>
                 <th>Id:</th>
                 <th>Nome:</th>
@@ -81,7 +81,7 @@ require 'cabecalho.php';
                     echo '<td>'.$clientes['forma_pagamento'].'</td>';
                     echo '<td>'.$clientes['valor_rodizio'].'</td>';
                     echo '<td>'.$clientes['num_mesa'].'</td>';
-                    echo '<td>'.$clientes['observacoes'].'</td>';
+                    echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
                     echo '<td>'.date('d/m/Y', strtotime($clientes['data_emissao'])).'</td>';
                     echo '<td>'.date('H:i:s', strtotime($clientes['data_emissao'])).'</td>';
                     echo '<td><div class="btn-group"><a class="btn btn-outline-primary pequeno" href="editar_reserva.php?id='.$clientes['id'].'">Editar</a><br><a class="btn btn-outline-danger pequeno" href="excluir_reserva.php?id='.$clientes['id'].'">Excluir</a></div></td>';
