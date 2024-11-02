@@ -27,7 +27,7 @@ require 'cabecalho.php';
     if ($filtro != "" && $filtro2 != "") {
         $data_formatada_inicio = date("d/m/Y", strtotime($filtro));
         $data_formatada_fim = date("d/m/Y", strtotime($filtro2));
-        print "<h4>Resultados encontrados entre as datas <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong></h4><br>";
+        print "<h6>Reservas canceladas entre as datas <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong></h6><br>";
     }
 
     $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND status = 0";
@@ -35,7 +35,7 @@ require 'cabecalho.php';
     $total_pessoas = 0;
     if ($sql->rowCount() > 0) {
         $total_pessoas = $sql->fetch()['total_pessoas'];
-        echo "<h4>Total de pessoas: $total_pessoas</h4><br>";
+        echo "<h7>Total de pessoas: $total_pessoas</h7><br>";
     }
     ?>
 
