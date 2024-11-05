@@ -31,11 +31,12 @@ require 'cabecalho_pesquisar_data.php';
                 <th>N° pessoas:</th>
                 <th>Horário:</th>
                 <th>Telefone:</th>
-                <th>Telefone 2:</th>
                 <th>Tipo de Evento:</th>
                 <th>Forma pagamento:</th>
                 <th class="obs-column">Obs:</th>
                 <th>Data Emissão:</th>
+                <th>Responsavel</th>
+
                 <th>Ações:</th>
             </tr>
             <?php
@@ -49,11 +50,11 @@ require 'cabecalho_pesquisar_data.php';
                     echo '<td>'.$clientes['num_pessoas'].'</td>';
                     echo '<td>'.$clientes['horario'].'</td>';
                     echo '<td>'.$clientes['telefone'].'</td>';
-                    echo '<td>'.$clientes['telefone2'].'</td>';
                     echo '<td>'.$clientes['tipo_evento'].'</td>';
                     echo '<td>'.$clientes['forma_pagamento'].'</td>';
                     echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
                     echo '<td>'.$clientes['data_emissao'].'</td>';
+                    echo '<td>'.$clientes['usuario_id'].'</td>';
                     echo '<td><div class="btn-group"><a class="btn btn-primary pequeno" href="editar_reserva.php?id='.$clientes['id'].'">Editar</a><a class="btn btn-danger pequeno" href="excluir_reserva.php?id='.$clientes['id'].'">Excluir</a></div></td>';
                     echo '</tr>';
                 }

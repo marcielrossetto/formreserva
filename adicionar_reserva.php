@@ -7,6 +7,7 @@ if (empty($_SESSION['mmnlogin'])) {
 }
 
 if (!empty($_POST['nome']) && !empty($_POST['data'])) {
+    $usuario_id = $_SESSION['mmnlogin'];  // Assumindo que o ID do usuário está armazenado na sessão
     $nome = addslashes($_POST['nome']);
     $data = addslashes($_POST['data']);
     $num_pessoas = addslashes($_POST['num_pessoas']);
@@ -25,7 +26,8 @@ if (!empty($_POST['nome']) && !empty($_POST['data'])) {
     $sql->execute();
 
     if ($sql->rowCount() == 0) {
-        $sql = $pdo->prepare("INSERT INTO clientes (nome, data, num_pessoas, horario, telefone, telefone2, tipo_evento, forma_pagamento, valor_rodizio, num_mesa, observacoes) VALUES(:nome, :data, :num_pessoas, :horario, :telefone, :telefone2, :tipo_evento, :forma_pagamento, :valor_rodizio, :num_mesa, :observacoes)");
+        $sql = $pdo->prepare("INSERT INTO clientes (usuario_id, nome, data, num_pessoas, horario, telefone, telefone2, tipo_evento, forma_pagamento, valor_rodizio, num_mesa, observacoes) VALUES(:usuario_id, :nome, :data, :num_pessoas, :horario, :telefone, :telefone2, :tipo_evento, :forma_pagamento, :valor_rodizio, :num_mesa, :observacoes)");
+        $sql->bindValue(":usuario_id", $usuario_id);
         $sql->bindValue(":nome", $nome);
         $sql->bindValue(":data", $data);
         $sql->bindValue(":num_pessoas", $num_pessoas);
@@ -38,9 +40,9 @@ if (!empty($_POST['nome']) && !empty($_POST['data'])) {
         $sql->bindValue(":num_mesa", $num_mesa);
         $sql->bindValue(":observacoes", $observacoes);
         $sql->execute();
-        echo "<script>alert('Cadastrado com Sucesso!'); window.location='index.php'</script>";
+        echo "<script>alert('Cadastrado com Sucesso!'); window.location='adicionar_reserva.php'</script>";
     } else {
-        echo "<script>alert('Já existe este usuário cadastrado!'); window.location='index.php'</script>";
+        echo "<script>alert('Já existe este usuário cadastrado!'); window.location='adicionar_reserva.php'</script>";
     }
 }
 
@@ -52,13 +54,13 @@ $ultimo_preco = $sql->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <div class="container col-md-6">
-    <h5>Cadastro <small>Reserva</small></h5>
+    <h5>Cadastro Nova <small>Reserva</small></h5>
     <hr>
-    <form method="POST">
+    <form method="POST" onsubmit="return validarFormulario()">
         Nome: <input id="nome" class="form-control" type="text" name="nome" placeholder="Digite o nome">
-        Data: <input class="form-control" id="data" type="date" name="data">
-        Número de pessoas: <input maxlength="2" class="form-control" type="number" name="num_pessoas" placeholder="Digite quantidade de pessoas">
-        Horário: <input class="form-control" type="time" name="horario">
+        Data: <input class="form-control" id="data" required type="date" name="data">
+        Número de pessoas: <input maxlength="2" required class="form-control" type="number" name="num_pessoas" placeholder="Digite quantidade de pessoas">
+        Horário: <input class="form-control" type="time" required name="horario">
         Telefone: <input class="form-control" type="number" name="telefone" placeholder="Digite um número de telefone">
         Telefone: <input class="form-control" type="number" name="telefone2" placeholder="Digite um número de telefone">
         Forma de pagamento:
@@ -110,5 +112,16 @@ $ultimo_preco = $sql->fetch(PDO::FETCH_ASSOC);
         <input class="btn btn-primary" type="submit" name="enviar" value="Enviar">
     </form>
 </div>
-</body>
-</html>
+
+<script>
+function validarFormulario() {
+    var data = document.getElementById('data').value;
+    var horario = document.getElementById('horario').value;
+    
+    if (data === '' || horario === '') {
+        alert('Por favor, preencha a data e o horário.');
+        return false;
+    }
+    return true;
+}
+</script>
