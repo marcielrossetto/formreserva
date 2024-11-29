@@ -1,78 +1,155 @@
 <?php
 session_start();
 require 'config.php';
+
 if (empty($_SESSION['mmnlogin'])) {
     header("Location: login.php");
     exit;
 }
+
 require 'cabecalho.php';
 ?>
 
 <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no">
-<div class="container-fluid">
-    <h3>Reservas canceladas</h3>
-    <div class="container-fluid">
-        <form method="POST" class="form-inline row">
-            <label>Data</label>
-            <input class="form-control" name="filtro" required placeholder="Data inicial" type="date">
-            <label>Data</label>
-            <input class="form-control" name="filtro2" required type="date">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisar</button>
+<div class="container-fluid my-4">
+    <div class="bg-light p-4 rounded shadow-sm">
+        <h2 class="text-center mb-4">Gerenciar Reservas</h2>
+        <form method="POST" class="form-inline row justify-content-center">
+            <div class="input-group col-md-6 col-sm-12 mb-3">
+                <input class="form-control" name="filtro_pesquisar" required type="text" placeholder="Pesquisar por nome ou telefone">
+                <div class="input-group-append">
+                    <button class="btn btn-success" type="submit">Pesquisar</button>
+                </div>
+            </div>
         </form>
-    </div>
 
-    <?php
-    $filtro = isset($_POST['filtro']) ? $_POST['filtro'] : "";
-    $filtro2 = isset($_POST['filtro2']) ? $_POST['filtro2'] : "";
-    if ($filtro != "" && $filtro2 != "") {
-        $data_formatada_inicio = date("d/m/Y", strtotime($filtro));
-        $data_formatada_fim = date("d/m/Y", strtotime($filtro2));
-        print "<h6>Reservas canceladas entre as datas <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong></h6><br>";
-    }
+        <?php
+        $filtro_pesquisar = isset($_POST['filtro_pesquisar']) ? $_POST['filtro_pesquisar'] : "";
+        if ($filtro_pesquisar != "") {
+            echo "<h6 class='text-center'>Resultado para <strong>'$filtro_pesquisar'</strong></h6><br>";
+        }
 
-    $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND status = 0";
-    $sql = $pdo->query($sql);
-    $total_pessoas = 0;
-    if ($sql->rowCount() > 0) {
-        $total_pessoas = $sql->fetch()['total_pessoas'];
-        echo "<h7>Total de pessoas: $total_pessoas</h7><br>";
-    }
-    ?>
+        // Busca registros com status = 0
+        $sql = "SELECT SUM(num_pessoas) AS total_pessoas FROM clientes WHERE (nome LIKE '%$filtro_pesquisar%' OR telefone LIKE '%$filtro_pesquisar%' OR telefone2 LIKE '%$filtro_pesquisar%') AND status = 0";
+        $stmt = $pdo->query($sql);
+        $total_pessoas = 0;
+        if ($stmt->rowCount() > 0) {
+            $total_pessoas = $stmt->fetch()['total_pessoas'];
+            echo "<h6 class='text-center'>Total de Pessoas: <span class='badge badge-primary'>$total_pessoas</span></h6><br>";
+        } else {
+            echo "<h6 class='text-center'>Nenhuma reserva encontrada com status ativo.</h6><br>";
+        }
+        ?>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover table-sm table-warning">
-            <tr>
-                <th>Id:</th>
-                <th>Nome:</th>
-                <th>Data:</th>
-                <th>N° pessoas:</th>
-                <th>Horário:</th>
-                <th>Mesa:</th>
-                <th>R$ rodízio:</th>
-                <th>Data Emissão:</th>
-                <th>Horário Emissão:</th>
-                <th>Ações:</th>
-            </tr>
-            <?php
-            $sql = "SELECT * FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND status = 0 ORDER BY `data` DESC, `horario` DESC";
-            $sql = $pdo->query($sql);
-            if ($sql->rowCount() > 0) {
-                foreach ($sql->fetchAll() as $clientes) {
-                    echo '<tr>';
-                    echo '<td>'.$clientes['id'].'</td>';
-                    echo '<td>'.$clientes['nome'].'</td>';
-                    echo '<td>'.date("d/m/Y", strtotime($clientes['data'])).'</td>';
-                    echo '<td>'.$clientes['num_pessoas'].'</td>';
-                    echo '<td>'.$clientes['horario'].'</td>';
-                    echo '<td>'.$clientes['num_mesa'].'</td>';
-                    echo '<td>'.$clientes['valor_rodizio'].'</td>';
-                    echo '<td>'.date("d/m/Y", strtotime($clientes['data_emissao'])).'</td>';
-                    echo '<td>'.date("H:i:s", strtotime($clientes['data_emissao'])).'</td>';
-                    echo '<td><div class="btn-group"><a class="btn btn-success" href="ativarReserva.php?id='.$clientes['id'].'">Ativar</a></div></td>';
-                    echo '</tr>';
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Data</th>
+                        <th>N° Pessoas</th>
+                        <th>Horário</th>
+                        <th>Telefone</th>
+                        <th>Observações</th>
+                        <th>Motivo Cancelamento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+                // Busca registros com status = 0
+                $sql = "SELECT * FROM clientes WHERE (nome LIKE '%$filtro_pesquisar%' OR telefone LIKE '%$filtro_pesquisar%' OR telefone2 LIKE '%$filtro_pesquisar%') AND status = 0 ORDER BY `data` ASC";
+                $stmt = $pdo->query($sql);
+                if ($stmt->rowCount() > 0) {
+                    foreach ($stmt->fetchAll() as $clientes) {
+                        echo '<tr>';
+                        echo '<td>' . htmlspecialchars($clientes['nome']) . '</td>';
+                        echo '<td>' . date("d/m/Y", strtotime($clientes['data'])) . '</td>';
+                        echo '<td>' . htmlspecialchars($clientes['num_pessoas']) . '</td>';
+                        echo '<td>' . htmlspecialchars($clientes['horario']) . '</td>';
+                        echo '<td>' . htmlspecialchars($clientes['telefone']) . '</td>';
+                        echo '<td class="obs-column"><div class="obs-content">' . nl2br(htmlspecialchars($clientes['observacoes'])) . '</div></td>';
+                        echo '<td>' . htmlspecialchars($clientes['motivo_cancelamento']) . '</td>';
+
+                        // Link para WhatsApp
+                        $telefone = preg_replace('/[^0-9]/', '', $clientes['telefone']); 
+                        $mensagem = "Olá " . ucfirst(strtolower($clientes['nome'])) . "! Estamos entrando em contato para remarcar, caso tenha interesse da sua reserva feita para " . $clientes['num_pessoas'] . " pessoas no dia " . date("d/m/Y", strtotime($clientes['data'])) . " às " . $clientes['horario'] . " hs. Se tiver interesse em remarcar me confirme com um OK para prosseguir para reagendamento.";
+                        $link_whatsapp = "https://wa.me/55$telefone?text=" . urlencode($mensagem);
+
+                        echo '<td>
+                                <div class="btn-group">
+                                    <a class="btn btn-sm btn-primary" href="ativar_reserva.php?id=' . $clientes['id'] . '">Ativar Reserva</a>
+                                    <a class="btn btn-sm btn-success" href="' . $link_whatsapp . '" target="_blank">Confirmar</a>
+                                </div>
+                              </td>';
+                        echo '</tr>';
+                    }
+                } else {
+                    echo '<tr><td colspan="8" class="text-center">Nenhuma reserva encontrada com status ativo.</td></tr>';
                 }
-            }
-            ?>
-        </table>
+                ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Estilo geral */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    /* Botões */
+    .btn-group .btn {
+        margin: 0 3px;
+    }
+    .btn-group .btn:hover {
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+
+    /* Tabela */
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table thead th {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    /* Observações */
+    .obs-content {
+        max-width: 250px;
+        max-height: 100px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+    /* Input de pesquisa */
+    .input-group input {
+        border-radius: 0.25rem 0 0 0.25rem;
+    }
+    .input-group .btn {
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .btn-group .btn {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .obs-content {
+            max-width: 100%;
+        }
+    }
+</style>
+

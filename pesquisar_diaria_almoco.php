@@ -15,8 +15,9 @@ require 'cabecalho.php';
         <h3 class="text-center w-100">Relatório Almoço</h3>
         <form method="POST" class="form-inline row d-flex justify-content-center">
             <input class="form-control mr-sm-4" name="filtro" required type="date">
-            <button href="pesquisar.php" class="btn btn-outline-dark my-2 my-sm-0" type="submit">Pesquisar</button>
+            <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Pesquisar</button>
         </form>
+        
     </div>
     
     <?php
@@ -34,21 +35,100 @@ require 'cabecalho.php';
         echo "<h4>Total de pessoas: $total</h4><br>";
     }
     ?>
-    <button class="btn btn-primary" onclick="printTable()">Imprimir Relatório</button></br>
+  
+    <style>
+        /* Estilos gerais para a tabela */
+        .table thead {
+            background-color: #f8f9fa;
+        }
+
+        .table th, .table td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .table-bordered {
+            border: 1px solid #ddd;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Estilos para a coluna de observação */
+        .obs-column .container {
+            width: 200px;
+            height: 70px;
+            overflow-y: auto; 
+            word-wrap: break-word;
+            border: 1px solid #ddd;
+            padding: 5px;
+            box-sizing: border-box;
+            font-size: 10px;
+            background-color: #f9f9f9;
+        }
+
+        /* Estilos para os botões */
+        .btn-group .btn {
+            margin: 0 5px;
+        }
+
+        .btn-group .btn:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        /* Estilos para impressão */
+        @media print {
+            table {
+                width: 100%;
+                table-layout: auto;
+                border-collapse: collapse;
+            }
+
+            td, th {
+                padding: 8px;
+                border: 1px solid #ddd;
+                word-wrap: break-word;
+            }
+
+            .obs-column {
+                width: 200px !important;
+                min-width: 200px !important;
+                max-width: 200px !important;
+            }
+
+            .obs-column .container {
+                width: 100%;
+                height: auto;
+                font-size: 10px;
+                overflow-y: visible;
+                white-space: normal;
+            }
+        }
+    </style>
+
+    <button class="btn btn-primary" onclick="printTable()">Imprimir Relatório</button><br><br>
     <div id="printableTable" class="table-responsive">
-        
         <div class="table-responsive table-sm">
             <table class="table table-bordered table-hover table-sm table-warning">
                 <tr>
                     <th>Id:</th>
                     <th>Nome:</th>
-                    <th>N° pessoas:</th>
-                    <th>Horário:</th>
+                    <th>N°:</th>
+                    <th>Hs:</th>
                     <th>Tipo de Evento:</th>
-                    <th>Forma pagamento:</th>
-                    <th>Telefone:</th>
-                    <th>Observações</th>
-                    <th>N° mesa:</th>
+                    <th>Pgto:</th>
+                    <th>Obs</th>
+                    <th>Mesa:</th>
                 </tr>
                 <?php
                 $sql = "SELECT * FROM clientes WHERE data = '$filtro' AND horario BETWEEN '11:00:00' AND '17:59:00' AND status = 1 ORDER BY `data` ASC";
@@ -62,7 +142,6 @@ require 'cabecalho.php';
                         echo '<td>'.$clientes['horario'].'</td>';
                         echo '<td>'.$clientes['tipo_evento'].'</td>';
                         echo '<td>'.$clientes['forma_pagamento'].'</td>';
-                        echo '<td>'.$clientes['telefone'].'</td>';
                         echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
                         echo '<td>'.$clientes['num_mesa'].'</td>';
                         echo '</tr>';
@@ -74,15 +153,63 @@ require 'cabecalho.php';
     </div>
 
     <script>
-    function printTable() {
-        var printContents = document.getElementById('printableTable').innerHTML;
-        var totalPessoas = "<?php echo '<h4>Total de pessoas: ' . $total . '</h4><br>'; ?>";
-        var dataReserva = "<?php echo '<p>Resultados com a data <strong>' . $dataFormatada . '</strong> das 11:00 às 17:59 hs</p>'; ?>";
-        var originalContents = document.body.innerHTML;
-        document.body.innerHTML = totalPessoas + dataReserva + printContents;
-        window.print();
-        document.body.innerHTML = originalContents;
-    }
+function printTable() {
+    // Obtenção dos valores dinâmicos PHP
+    var totalPessoas = "<?php echo isset($total) ? '<h4>Total de pessoas: ' . $total . '</h4><br>' : ''; ?>";
+    var dataReserva = "<?php echo isset($dataFormatada) ? '<p>Data <strong>' . $dataFormatada . '</strong> das 11:00 às 17:59 hs</p>' : ''; ?>";
+
+    // Obtenção do conteúdo da tabela para impressão
+    var printContents = document.getElementById('printableTable').innerHTML;
+    var originalContents = document.body.innerHTML;
+    
+    // Estilos de impressão específicos
+    var printStyles = `
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+            table {
+                width: 100%;
+                table-layout: auto;
+                border-collapse: collapse;
+            }
+            td, th {
+                padding: 8px;
+                border: 1px solid #ddd;
+                text-align: center;
+                word-wrap: break-word;
+            }
+            .obs-column .container {
+                width: 100%;
+                height: auto;
+                font-size: 10px;
+                overflow-y: visible;
+                white-space: normal;
+                word-wrap: break-word;
+            }
+            @media print {
+                .obs-column {
+                    width: 200px !important;
+                    min-width: 200px !important;
+                    max-width: 200px !important;
+                }
+                .btn {
+                    display: none; /* Esconde o botão de impressão na página impressa */
+                }
+            }
+        </style>
+    `;
+    
+    // Substitui o conteúdo da página para impressão
+    document.body.innerHTML = totalPessoas + dataReserva + printStyles + printContents;
+    
+    // Inicia a impressão
+    window.print();
+    
+    // Restaura o conteúdo original da página
+    document.body.innerHTML = originalContents;
+}
 </script>
+
 
 </div>
