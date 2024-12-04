@@ -137,3 +137,4 @@ require 'cabecalho_pesquisar_data.php';
         </table>
     </div>
 </div>
+<?php require 'rodape.php'; ?>

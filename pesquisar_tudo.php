@@ -127,3 +127,4 @@ require 'cabecalho.php';
         }
     }
 </style>
+<?php require 'rodape.php'; ?>

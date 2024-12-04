@@ -7,6 +7,8 @@
   <link rel="shortcut icon" type="" href="image/comp.ico">
   <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
@@ -95,6 +97,7 @@
       </ul>
     </div>
   </nav>
+
   <script src="script.js"></script>
 </body>
 

@@ -118,9 +118,9 @@ $ultimo_preco = $sql->fetch(PDO::FETCH_ASSOC);
                         <?php
                         if ($ultimo_preco) {
                             echo "<option value='{$ultimo_preco['almoco']}'>Almoço - R$ {$ultimo_preco['almoco']}</option>";
-                            echo "<option value='{$ultimo_preco['jantar']}'>Jantar - R$ {$ultimo_preco['jantar']}</option>";
+                            echo "<option value='{$ultimo_preco['jantar']}'>Jantar - R$ {$ultimo_preco['jantar']}</option>";                           
+                            echo "<option value='{$ultimo_preco['outros']}'>Sàbado - R$ {$ultimo_preco['outros']}</option>"; 
                             echo "<option value='{$ultimo_preco['domingo_almoco']}'>Domingo Almoço - R$ {$ultimo_preco['domingo_almoco']}</option>";
-                            echo "<option value='{$ultimo_preco['outros']}'>Outros - R$ {$ultimo_preco['outros']}</option>";
                         }
                         ?>
                     </select>
@@ -164,3 +164,4 @@ function validarFormulario() {
     return true;
 }
 </script>
+<?php require 'rodape.php'; ?>

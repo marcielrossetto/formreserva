@@ -64,3 +64,4 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
         </table>
     </div>
 </div>
+<?php require 'rodape.php'; ?>

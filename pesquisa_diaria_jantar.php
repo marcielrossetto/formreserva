@@ -129,3 +129,4 @@ function printTable() {
 }
 </script>
 </div>
+<?php require 'rodape.php'; ?>

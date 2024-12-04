@@ -89,3 +89,4 @@ require 'cabecalho.php';
         border-radius: 4px;
     }
 </style>
+<?php require 'rodape.php'; ?>

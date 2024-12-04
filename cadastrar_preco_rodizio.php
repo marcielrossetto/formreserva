@@ -39,9 +39,10 @@ if (!empty($_POST['almoco']) && !empty($_POST['jantar'])) {
             <form method="POST">
                 <div class="form-group">
                     Almoço: <input class="form-control" type="text" name="almoco">
-                    Jantar: <input class="form-control" type="text" name="jantar">
+                    Jantar: <input class="form-control" type="text" name="jantar">  
+                    Sàbado: <input class="form-control" type="text" name="outros"><br>
                     Domingo Almoço: <input class="form-control" type="text" name="domingo_almoco"><br>
-                    Desconto: <input class="form-control" type="text" name="outros"><br>
+                  
                     <input class="btn btn-primary btn-lg" type="submit" value="Cadastrar">
                 </div>
             </form>
@@ -50,3 +51,4 @@ if (!empty($_POST['almoco']) && !empty($_POST['jantar'])) {
 </div>
 </body>
 </html>
+<?php require 'rodape.php'; ?>

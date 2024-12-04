@@ -1,94 +1,133 @@
 <?php
 session_start();
 require 'config.php';
+
 if (empty($_SESSION['mmnlogin'])) {
     header("Location: login.php");
     exit;
 }
+
 require 'cabecalho.php';
 ?>
 
-<meta id="viewport" name="viewport" content="width=device-width, user-scalable=no">
-<div class="container-fluid">
-    <h3>Pesquisar reserva entre datas</h3>
-    <div class="container-fluid">
-        <form method="POST" class="form-inline row">
-            <label>Data</label>
-            <input class="form-control" name="filtro" required placeholder="Data inicial" type="date">
-            <label>Data</label>
-            <input class="form-control" name="filtro2" required type="date">
-            <label>Horário inicial:</label>
-            <input class="form-control" name="hora1" required type="time">
-            <label>Horário final:</label>
-            <input class="form-control" name="hora2" required type="time">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisar</button>
-        </form>
-    </div>
+<div style="width: 100%; margin: 20px auto; padding: 10px;">
+    <h3 style="text-align: center;">Pesquisar Reservas</h3>
+
+    <form method="POST" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 20px;">
+        <div style="flex: 1 1 200px;">
+            <label>Data Inicial:</label>
+            <input type="date" name="data_inicio" style="width: 100%; padding: 5px;">
+        </div>
+        <div style="flex: 1 1 200px;">
+            <label>Data Final:</label>
+            <input type="date" name="data_fim" style="width: 100%; padding: 5px;">
+        </div>
+        <div style="flex: 1 1 200px;">
+            <label>Horário Inicial:</label>
+            <input type="time" name="hora_inicio" style="width: 100%; padding: 5px;">
+        </div>
+        <div style="flex: 1 1 200px;">
+            <label>Horário Final:</label>
+            <input type="time" name="hora_fim" style="width: 100%; padding: 5px;">
+        </div>
+        <div style="flex: 1 1 300px;">
+            <label>Buscar</label>
+            <input type="text" name="busca" placeholder="Digite nome ou telefone" style="width: 100%; padding: 5px;">
+        </div>
+        <div style="flex: 1 1 100px; display: flex; align-items: flex-end;">
+            <button type="submit" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Pesquisar
+            </button>
+        </div>
+    </form>
 
     <?php
-    $filtro = isset($_POST['filtro']) ? $_POST['filtro'] : "";
-    $filtro2 = isset($_POST['filtro2']) ? $_POST['filtro2'] : "";
-    $horario1 = isset($_POST['hora1']) ? $_POST['hora1'] : "";
-    $horario2 = isset($_POST['hora2']) ? $_POST['hora2'] : "";
-    if ($filtro != "" && $filtro2 != "" && $horario1 != "" && $horario2 != "") {
-        $data_formatada_inicio = date("d/m/Y", strtotime($filtro));
-        $data_formatada_fim = date("d/m/Y", strtotime($filtro2));
-        print "<p>Resultado <strong>$data_formatada_inicio</strong> e <strong>$data_formatada_fim</strong> e hs <strong>$horario1</strong> e <strong>$horario2</strong> hs.</p><br>";
+    $data_inicio = $_POST['data_inicio'] ?? "";
+    $data_fim = $_POST['data_fim'] ?? "";
+    $hora_inicio = $_POST['hora_inicio'] ?? "";
+    $hora_fim = $_POST['hora_fim'] ?? "";
+    $busca = $_POST['busca'] ?? "";
+
+    $query = "SELECT * FROM clientes WHERE 1=1";
+
+    if ($data_inicio && $data_fim) {
+        $query .= " AND data BETWEEN '$data_inicio' AND '$data_fim'";
+    }
+    if ($hora_inicio && $hora_fim) {
+        $query .= " AND horario BETWEEN '$hora_inicio' AND '$hora_fim'";
+    }
+    if ($busca) {
+        $query .= " AND (nome LIKE '%$busca%' OR telefone LIKE '%$busca%')";
     }
 
-    $sql = "SELECT SUM(num_pessoas) as total FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND horario BETWEEN '$horario1' AND '$horario2' AND status = 1";
-    $sql = $pdo->query($sql);
-    $total_pessoas = 0;
-    if ($sql->rowCount() > 0) {
-        $total_pessoas = $sql->fetch()['total'];
-        echo "<h6>Total de pessoas: $total_pessoas</h6><br>";
-    }
+    $query .= " ORDER BY data DESC, horario DESC";
+    $sql = $pdo->query($query);
+
+    $total_pessoas = $pdo->query("SELECT SUM(num_pessoas) as total FROM clientes WHERE status = 1")->fetch()['total'];
+    echo "<h5 style='text-align: center;'>Total de Pessoas nas Reservas Ativas: $total_pessoas</h5>";
     ?>
 
-    <div class="table-responsive table-sm">
-        <table class="table table-bordered table-hover table-sm table-warning">
-            <tr>
-                <th>Id:</th>
-                <th>Nome:</th>
-                <th>Data:</th>
-                <th>Quant:</th>
-                <th>Horário:</th>
-                <th>Telefone:</th>
-                <th>Telefone 2:</th>
-                <th>Evento:</th>
-                <th>Conta:</th>
-                <th>R$:</th>
-                <th>Mesa:</th>
-                <th>Obs:</th>
-                <th>Data Emissão:</th>
-                <th>Horário Emissão:</th>
-                <th>Ações:</th>
-            </tr>
-            <?php
-            $sql = "SELECT * FROM clientes WHERE data BETWEEN '$filtro' AND '$filtro2' AND horario BETWEEN '$horario1' AND '$horario2' AND status = 1 ORDER BY `data` DESC, `horario` DESC";
-            $sql = $pdo->query($sql);
-            if ($sql->rowCount() > 0) {
-                foreach ($sql->fetchAll() as $clientes) {
-                    echo '<tr>';
-                    echo '<td>'.$clientes['id'].'</td>';
-                    echo '<td>'.$clientes['nome'].'</td>';
-                    echo '<td>'.date('d/m/Y', strtotime($clientes['data'])).'</td>';
-                    echo '<td>'.$clientes['num_pessoas'].'</td>';
-                    echo '<td>'.$clientes['horario'].'</td>';
-                    echo '<td>'.$clientes['telefone'].'</td>';
-                    echo '<td>'.$clientes['telefone2'].'</td>';
-                    echo '<td>'.$clientes['tipo_evento'].'</td>';
-                    echo '<td>'.$clientes['forma_pagamento'].'</td>';
-                    echo '<td>'.$clientes['valor_rodizio'].'</td>';
-                    echo '<td>'.$clientes['num_mesa'].'</td>';
-                    echo '<td class="obs-column"><div class="container">'.$clientes['observacoes'].'</div></td>';
-                    echo '<td>'.date('d/m/Y', strtotime($clientes['data_emissao'])).'</td>';
-                    echo '<td>'.date('H:i:s', strtotime($clientes['data_emissao'])).'</td>';
-                    echo '<td><div class="btn-group"><a class="btn btn-outline-primary pequeno" href="editar_reserva.php?id='.$clientes['id'].'">Editar</a><br><a class="btn btn-outline-danger pequeno" href="excluir_reserva.php?id='.$clientes['id'].'">Excluir</a></div></td>';
-                    echo '</tr>';
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #ddd;">
+            <thead style="background-color: #343a40; color: white;">
+                <tr>
+                    <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Nome</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Data e Hora</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">N° Pessoas</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Telefone</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Tipo de Evento</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Forma de Pagamento</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Valor</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Mesa</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Observações</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Usuário</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Motivo cancelamento</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($sql->rowCount() > 0) {
+                    foreach ($sql->fetchAll() as $reserva) {
+                        $status_class = $reserva['status'] == 0 ? 'color: red; text-decoration: line-through;' : '';
+                        $telefone = preg_replace('/[^0-9]/', '', $reserva['telefone']);
+                        $mensagem = "Olá " . htmlspecialchars($reserva['nome']) . "! Tudo bem? Aqui é da Churrascaria Verdanna! Confirmamos sua reserva para " . $reserva['num_pessoas'] . " pessoas no dia " . date("d/m/Y", strtotime($reserva['data'])) . " às " . htmlspecialchars($reserva['horario']) . ". Confirme com OK. Agradecemos!";
+                        $link_whatsapp = "https://wa.me/55$telefone?text=" . urlencode($mensagem);
+
+                        echo "<tr style='$status_class'>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['id']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['nome']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . date('d/m/Y H:i', strtotime($reserva['data'] . ' ' . $reserva['horario'])) . "</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['num_pessoas']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['telefone']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['tipo_evento']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['forma_pagamento']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['valor_rodizio']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['num_mesa']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>
+                                <div style='max-width: 300px; max-height: 100px; overflow-y: auto; word-wrap: break-word; font-size: auto;'>
+                                    " . htmlspecialchars($reserva['observacoes']) . "
+                                </div>
+                            </td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['status']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['usuario_id']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>{$reserva['motivo_cancelamento']}</td>";
+                        echo "<td style='border: 1px solid #ddd; padding: 8px;'>
+                                <a href='editar_reserva.php?id={$reserva['id']}' style='background-color: #e0e0e0; color: black; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>Editar</a>
+                                <a href='excluir_reserva.php?id={$reserva['id']}' style='background-color: #ffcccc; color: black; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>Excluir</a>
+                                <a href='$link_whatsapp' target='_blank' style='background-color: #c8e6c9; color: black; padding: 5px 10px; border-radius: 5px; text-decoration: none;'>Confirmar</a>
+                            </td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='13' style='border: 1px solid #ddd; padding: 8px;'>Nenhuma reserva encontrada.</td></tr>";
                 }
-            }
-            ?>
+                ?>
+            </tbody>
         </table>
     </div>
 </div>
+
+<?php require 'rodape.php'; ?>

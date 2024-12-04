@@ -5,7 +5,7 @@ if (empty($_SESSION['mmnlogin'])) {
     header("Location: login.php");
     exit;
 }
-require 'cabecalho_pesquisar_data.php';
+require 'cabecalho.php';
 ?>
 <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no">
 <div class="container-fluid my-4">
@@ -143,3 +143,4 @@ require 'cabecalho_pesquisar_data.php';
         }
     }
 </style>
+<?php require 'rodape.php'; ?>

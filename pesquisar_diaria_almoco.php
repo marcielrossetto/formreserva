@@ -213,3 +213,4 @@ function printTable() {
 
 
 </div>
+<?php require 'rodape.php'; ?>

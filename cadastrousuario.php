@@ -59,3 +59,4 @@
 </body>
 
 </html>    
+<?php require 'rodape.php'; ?>
